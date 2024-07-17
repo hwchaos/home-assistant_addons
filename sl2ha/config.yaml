@@ -27,8 +27,8 @@ options:
   debug: false
   endpoint_1: "states/input_boolean.doorman"
   endpoint_2: "states/input_boolean.doorman"
-  to_seek_1: 'r"Authenticated"'
-  to_seek_2: 'r"Connection closed"'
+  to_seek_1: "Authenticated"
+  to_seek_2: "Connection closed"
   payload_1: '{"state": "on"}'
   payload_2: '{"state": "off"}'
 schema:
