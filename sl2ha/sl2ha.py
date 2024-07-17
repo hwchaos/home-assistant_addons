@@ -101,19 +101,20 @@ class SyslogUDPHandler(socketserver.BaseRequestHandler):
         Creates the payload from the syslog message.
         """
         try:
-            # Example logic to extract necessary information from data
-            # Replace with your actual logic to generate the payload
-            # For example, extracting "payload" from the data
-            extracted_payload = "payload"
-
-            # Construct the payload dictionary
-            payload = {"state": extracted_payload}
-
-            logger_sl2ha.debug("Created payload: %s", payload)
-            return payload
+            # Example logic to extract 'Chaos' from the syslog message
+            match = re.search(r"<\d+:(\w+)\(\d+\)>", data)
+            if match:
+                name = match.group(1)
+                payload = {"state": name}  # Construct payload with 'state' key
+                logger_sl2ha.debug("Created payload: %s", payload)
+                return payload
+            else:
+                logger_sl2ha.error("Pattern not found in data: %s", data)
+                return {}
         except Exception as e:
             logger_sl2ha.error("Failed to create payload: %s", e)
             return {}
+
 
 if __name__ == "__main__":
     try:
