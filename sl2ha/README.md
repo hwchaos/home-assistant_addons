@@ -1,4 +1,4 @@
-# Home Assistant Add-on: SL2HA add-on
+# Home Assistant Add-on: SL2HAr add-on
 
 _Mini Syslog Server that continuously performs a POST request to Home Assistant API when strings are present on a log received._
 
