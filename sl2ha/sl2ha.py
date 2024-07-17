@@ -17,6 +17,7 @@ import logging
 import socketserver
 import os
 import re
+import json
 from requests import post
 from config import (
     DEBUG_MODE,
@@ -39,6 +40,9 @@ headers = {
 # URLs for the endpoints
 endpoint_1_url = 'http://supervisor/core/api/' + ENDPOINT_1
 endpoint_2_url = 'http://supervisor/core/api/' + ENDPOINT_2
+
+# Payload to send
+payload_template = {"state": "payload"}
 
 # Own logger setup (This is not related to the Syslog server)
 logging.basicConfig(
@@ -80,35 +84,35 @@ class SyslogUDPHandler(socketserver.BaseRequestHandler):
         # Check for matches using regular expressions
         if re.search(TO_SEEK_1, data):
             logger_sl2ha.info("%s: matched pattern: %s", source, TO_SEEK_1)
-            payload = self.extract_payload(data)
-            response = post(url=endpoint_1_url, headers=headers, json=payload)
-            logger_sl2ha.debug("Response from API at: %s with code: %s, data: %s", endpoint_1_url, response.status_code, response.text)
+            payload = self.create_payload(data)
+            if payload:
+                response = post(url=endpoint_1_url, headers=headers, json=payload)
+                logger_sl2ha.debug("Response from API at: %s with code: %s, data: %s", endpoint_1_url, response.status_code, response.text)
 
         elif re.search(TO_SEEK_2, data):
             logger_sl2ha.info("%s: matched pattern: %s", source, TO_SEEK_2)
-            payload = self.extract_payload(data)
-            response = post(url=endpoint_2_url, headers=headers, json=payload)
-            logger_sl2ha.debug("Response from API at: %s with code: %s, data: %s", endpoint_2_url, response.status_code, response.text)
+            payload = self.create_payload(data)
+            if payload:
+                response = post(url=endpoint_2_url, headers=headers, json=payload)
+                logger_sl2ha.debug("Response from API at: %s with code: %s, data: %s", endpoint_2_url, response.status_code, response.text)
 
-    def extract_payload(self, data):
+    def create_payload(self, data):
         """
-        Extracts the payload from the syslog message.
-        Extracts the name in the format <n:Name(n)>.
+        Creates the payload from the syslog message.
         """
         try:
-            # Regular expression to match the pattern <n:Name(n)>
-            match = re.search(r"<\d+:(\w+)\(\d+\)>", data)
-            if match:
-                # Extract the name from the match group
-                name = match.group(1)
-                payload = {"name": name}  # Create a payload dictionary
-                logger_sl2ha.debug("Extracted payload: %s", payload)
-                return payload
-            else:
-                logger_sl2ha.error("Pattern not found in data: %s", data)
-                return {}
+            # Example logic to extract necessary information from data
+            # Replace with your actual logic to generate the payload
+            # For example, extracting "payload" from the data
+            extracted_payload = "payload"
+
+            # Construct the payload dictionary
+            payload = {"state": extracted_payload}
+
+            logger_sl2ha.debug("Created payload: %s", payload)
+            return payload
         except Exception as e:
-            logger_sl2ha.error("Failed to extract payload: %s", e)
+            logger_sl2ha.error("Failed to create payload: %s", e)
             return {}
 
 if __name__ == "__main__":
@@ -124,4 +128,3 @@ if __name__ == "__main__":
         raise
     except KeyboardInterrupt:
         print("Crtl+C Pressed. Shutting down.")
-
