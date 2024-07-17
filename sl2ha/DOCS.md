@@ -1,4 +1,4 @@
-# Home Assistant Add-on: SL2HA add-on
+# Home Assistant Add-on: SL2HAr add-on
 
 This is meant to be used as a [Home Assistant](https://www.home-assistant.io) add-on.
 
