@@ -1,9 +1,9 @@
 # https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
-name: "SL2HA add-on"
-version: "0.1.1"
-slug: sl2ha
-description: SL2HA add-on
-url: "https://github.com/MrMauro/home-assistant_addons/sl2ha"
+name: "SL2HAr add-on"
+version: "0.9"
+slug: sl2har
+description: SL2HAr add-on
+url: "https://github.com/hwchaos/home-assistant_addons/sl2ha"
 arch:
   - armhf
   - armv7
@@ -27,8 +27,8 @@ options:
   debug: false
   endpoint_1: "states/input_boolean.doorman"
   endpoint_2: "states/input_boolean.doorman"
-  to_seek_1: "[DAA]: FXO ring on"
-  to_seek_2: "[DAA]: FXO ring off"
+  to_seek_1: 'r"Authenticated"'
+  to_seek_2: 'r"Connection closed"'
   payload_1: '{"state": "on"}'
   payload_2: '{"state": "off"}'
 schema:
