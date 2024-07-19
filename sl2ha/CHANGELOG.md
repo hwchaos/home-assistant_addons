@@ -4,10 +4,9 @@
 
 - Initial release -->
 
-## 0.1.1
+## 0.9.1
 
-- fix: s6-overlay-suexec: fatal: can only run as pid 1
+- modifying regex
+## 0.9.0
 
-## 0.1.0
-
-- Beta release
+- inital fork
