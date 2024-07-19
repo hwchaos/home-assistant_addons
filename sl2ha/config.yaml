@@ -1,7 +1,7 @@
 # Add-on configuration for Home Assistant
 
 name: "SL2HAr add-on"
-version: "0.9"
+version: "0.9.1"
 slug: sl2har
 description: SL2HAr add-on
 url: "https://github.com/hwchaos/home-assistant_addons/sl2ha"
