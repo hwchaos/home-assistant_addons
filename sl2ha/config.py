@@ -1,14 +1,22 @@
-"""
-This file is for development purposes.
-The deployment version won't take it to the container. Instead, run.sh will
-generate one with the options provided by bashio.
-"""
+# config.py
 
+# Set debug mode
 DEBUG_MODE = True
+
+# Custom port
 CUSTOM_PORT = 514
-ENDPOINT_1 = "states/input_boolean.doorman"
-ENDPOINT_2 = "states/input_boolean.doorman"
-TO_SEEK_1 = 'r"Authenticated"'
-TO_SEEK_2 = 'r"Connection closed"'
-PAYLOAD_1 = '{"state": "on"}'
-PAYLOAD_2 = '{"state":"off"}'
+
+# Endpoints for Home Assistant API
+ENDPOINT_1 = "path/to/endpoint1"
+ENDPOINT_2 = "path/to/endpoint2"
+
+# Define regex patterns and payload templates
+TO_SEEK_1 = {
+    "pattern": r"<\d+:(\w+)\(\d+\)>",  # Example regex pattern
+    "payload_template": '{"state": "{extracted}"}'
+}
+
+TO_SEEK_2 = {
+    "pattern": r"Connection closed: (\w+)",  # Another example regex pattern
+    "payload_template": '{"state": "{extracted}"}'
+}
