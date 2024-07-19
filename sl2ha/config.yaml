@@ -1,4 +1,5 @@
-# https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
+# Add-on configuration for Home Assistant
+
 name: "SL2HAr add-on"
 version: "0.9"
 slug: sl2har
@@ -20,22 +21,31 @@ ports:
 ports_description:
   514/udp: "Port to listen logs"
 
-# This add-on can access to the Home Assistant REST API proxy
+# This add-on can access the Home Assistant REST API proxy
 homeassistant_api: true
 
 options:
   debug: false
   endpoint_1: "states/input_boolean.doorman"
   endpoint_2: "states/input_boolean.doorman"
-  to_seek_1: "Authenticated"
-  to_seek_2: "Connection closed"
-  payload_1: '{"state": "on"}'
-  payload_2: '{"state": "off"}'
+  to_seek_1:
+    pattern: "<\\d+:(\\w+)\\(\\d+\\)>"
+    payload_template: '{"state": "{extracted}"}'
+  to_seek_2:
+    pattern: "Connection closed: (\\w+)"
+    payload_template: '{"state": "{extracted}"}'
+
 schema:
   debug: bool
   endpoint_1: str
   endpoint_2: str
-  to_seek_1: str
-  to_seek_2: str
-  payload_1: str
-  payload_2: str
+  to_seek_1:
+    type: dict
+    keys:
+      pattern: str
+      payload_template: str
+  to_seek_2:
+    type: dict
+    keys:
+      pattern: str
+      payload_template: str
