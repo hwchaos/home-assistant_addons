@@ -41,9 +41,6 @@ headers = {
 endpoint_1_url = 'http://supervisor/core/api/' + ENDPOINT_1
 endpoint_2_url = 'http://supervisor/core/api/' + ENDPOINT_2
 
-# Payload to send
-payload_template = {"state": "payload"}
-
 # Own logger setup (This is not related to the Syslog server)
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -52,7 +49,7 @@ logging.basicConfig(
 logger_sl2ha = logging.getLogger(__name__)
 
 # Greet
-logger_sl2ha.info("Syslog to Home Assistant has started using the following configuration:\n\tDebug: %s|%s\n\tPort: %s|%s\n\tEndpoint 1: %s|%s\n\tEndpoint 2: %s|%s\n\tSeek 1: %s|%s\n\tSeek 2: %s|%s", type(DEBUG_MODE), DEBUG_MODE, type(CUSTOM_PORT), CUSTOM_PORT, type(endpoint_1_url), endpoint_1_url, type(endpoint_2_url), endpoint_2_url, type(TO_SEEK_1), TO_SEEK_1, type(TO_SEEK_2), TO_SEEK_2)
+logger_sl2ha.info("Syslog to Home Assistant has started using the following configuration:\n\tDebug: %s|%s\n\tPort: %s|%s\n\tEndpoint 1: %s|%s\n\tEndpoint 2: %s|%s", type(DEBUG_MODE), DEBUG_MODE, type(CUSTOM_PORT), CUSTOM_PORT, type(endpoint_1_url), endpoint_1_url, type(endpoint_2_url), endpoint_2_url)
 
 # Own-logger level setup
 if str(DEBUG_MODE) == 'true' or str(DEBUG_MODE) == 'True':
@@ -82,40 +79,35 @@ class SyslogUDPHandler(socketserver.BaseRequestHandler):
         logger_sl2ha.debug("%s has a new log with data:\n%s", source, str(data))
 
         # Check for matches using regular expressions
-        if re.search(TO_SEEK_1, data):
-            logger_sl2ha.info("%s: matched pattern: %s", source, TO_SEEK_1)
-            payload = self.create_payload(data)
-            if payload:
-                response = post(url=endpoint_1_url, headers=headers, json=payload)
-                logger_sl2ha.debug("Response from API at: %s with code: %s, data: %s", endpoint_1_url, response.status_code, response.text)
+        for endpoint, config in [
+            (endpoint_1_url, TO_SEEK_1),
+            (endpoint_2_url, TO_SEEK_2)
+        ]:
+            match = re.search(config["pattern"], data)
+            if match:
+                logger_sl2ha.info("%s: matched pattern: %s", source, config["pattern"])
+                payload = self.create_payload(config["payload_template"], match)
+                if payload:
+                    response = post(url=endpoint, headers=headers, json=payload)
+                    logger_sl2ha.debug("Response from API at: %s with code: %s, data: %s", endpoint, response.status_code, response.text)
 
-        elif re.search(TO_SEEK_2, data):
-            logger_sl2ha.info("%s: matched pattern: %s", source, TO_SEEK_2)
-            payload = self.create_payload(data)
-            if payload:
-                response = post(url=endpoint_2_url, headers=headers, json=payload)
-                logger_sl2ha.debug("Response from API at: %s with code: %s, data: %s", endpoint_2_url, response.status_code, response.text)
-
-    def create_payload(self, data):
+    def create_payload(self, template, match):
         """
-        Creates the payload from the syslog message.
+        Creates the payload from the syslog message using a template.
         """
         try:
-            # Example logic to extract 'Chaos' from the syslog message
-            match = re.search(r"<\d+:(\w+)\(\d+\)>", data)
-            if match:
-                name = match.group(1)
-                payload = {"state": name}  # Construct payload with 'state' key
-                logger_sl2ha.debug("Created payload: %s", payload)
-                return payload
-            else:
-                logger_sl2ha.error("Pattern not found in data: %s", data)
-                return {}
+            # Extract the relevant data from the match object
+            extracted_value = match.group(1)  # Adjust group index as necessary
+
+            # Format the payload template with the extracted value
+            payload_str = template.format(extracted=extracted_value)
+            payload = json.loads(payload_str)  # Convert string to JSON
+
+            logger_sl2ha.debug("Created payload: %s", payload)
+            return payload
         except Exception as e:
             logger_sl2ha.error("Failed to create payload: %s", e)
             return {}
-
-
 
 if __name__ == "__main__":
     try:
